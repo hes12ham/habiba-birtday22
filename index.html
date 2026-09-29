@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habiba's Birthday Countdown</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Great+Vibes&display=swap');
+
+:root {
+  --ink: #0a0d1f;
+  --ink-deep: #05060f;
+  --gold: #d4af55;
+  --gold-bright: #f0d68a;
+  --rose: #e8a4b8;
+  --cream: #f2ecdd;
+  --muted: #8b8ba3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: var(--ink-deep);
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--cream);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ═══════════ NIGHT SKY BACKGROUND ═══════════ */
+.sky {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(212,175,85,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 100%, rgba(232,164,184,0.06) 0%, transparent 60%),
+    linear-gradient(180deg, #05060f 0%, #0a0d1f 40%, #0d1128 100%);
+  z-index: 0;
+}
+
+.star {
+  position: fixed;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: twinkle 4s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.7; }
+}
+
+/* ═══════════ COUNTDOWN VIEW ═══════════ */
+#countdownView {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.today-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(13px, 2.5vw, 15px);
+  letter-spacing: 4px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.today-date {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 500;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+
+.today-clock {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 2.8vw, 16px);
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 56px;
+  opacity: 0.85;
+}
+
+.occasion-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(15px, 3vw, 19px);
+  color: var(--rose);
+  margin-bottom: 14px;
+}
+
+.occasion-name {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(42px, 9vw, 74px);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 40%, var(--gold) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 48px;
+  line-height: 1;
+}
+
+.timer {
+  display: flex;
+  gap: clamp(10px, 3vw, 28px);
+  align-items: flex-start;
+  margin-bottom: 44px;
+}
+
+.timer-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: clamp(58px, 15vw, 96px);
+}
+
+.timer-num {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(38px, 10vw, 68px);
+  color: var(--cream);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+}
+
+.timer-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(10px, 2vw, 12px);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.timer-sep {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 8vw, 54px);
+  color: var(--gold);
+  opacity: 0.4;
+  align-self: center;
+  margin: 0 -6px;
+  padding-bottom: 22px;
+}
+
+.countdown-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(15px, 3vw, 18px);
+  color: var(--muted);
+  max-width: 420px;
+  line-height: 1.9;
+}
+
+.countdown-msg .heart {
+  color: var(--rose);
+}
+
+/* ═══════════ CELEBRATION VIEW ═══════════ */
+#celebrateView {
+  display: none;
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 24px;
+  text-align: center;
+}
+
+.cel-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(15px, 3vw, 19px);
+  color: var(--rose);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.cel-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(30px, 6.5vw, 52px);
+  color: var(--cream);
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.cel-title .gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cel-name {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(48px, 11vw, 90px);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 45%, var(--gold) 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 36px;
+  line-height: 1;
+}
+
+.cel-sep {
+  width: 70px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,85,0.5), transparent);
+  margin-bottom: 30px;
+}
+
+.cel-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 480px;
+  margin-bottom: 44px;
+}
+
+.cel-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 3.2vw, 20px);
+  color: var(--cream);
+  line-height: 1.85;
+  opacity: 0.92;
+}
+
+.cel-msg.script {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(24px, 5vw, 34px);
+  color: var(--rose);
+  margin-top: 6px;
+}
+
+/* Video package */
+.video-wrap {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,175,85,0.25);
+  border-radius: 18px;
+  padding: 22px;
+  backdrop-filter: blur(6px);
+}
+
+.video-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+  background: #000;
+}
+
+.video-fallback {
+  padding: 50px 16px;
+  color: var(--muted);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.play-btn {
+  margin-top: 16px;
+  background: linear-gradient(135deg, var(--gold), #c9a04a);
+  border: none;
+  color: var(--ink-deep);
+  padding: 13px 34px;
+  border-radius: 50px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+.play-btn:hover { transform: translateY(-2px); }
+
+/* Floating hearts */
+.float-heart {
+  position: fixed;
+  bottom: -30px;
+  color: var(--rose);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  animation: floatUp 6s ease-in forwards;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-100vh) translateX(var(--drift, 20px)) rotate(20deg); opacity: 0; }
+}
+
+@media (max-width: 420px) {
+  .timer { gap: 8px; }
+  .timer-sep { margin: 0 -4px; }
+}
+
+/* ═══════════ MUSIC TOGGLE ═══════════ */
+.music-toggle {
+  position: fixed;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: 20px;
+  z-index: 10;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(212,175,85,0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+.music-toggle:hover { background: rgba(212,175,85,0.15); }
+.music-toggle.playing { border-color: var(--gold); }
+.music-hint {
+  position: fixed;
+  top: calc(70px + env(safe-area-inset-top, 0px));
+  right: 20px;
+  z-index: 10;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  opacity: 0.7;
+  max-width: 140px;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+
+<div class="sky"></div>
+<div id="starsContainer"></div>
+
+<button class="music-toggle" id="musicToggle" onclick="toggleMusic()">🔈</button>
+<div class="music-hint" id="musicHint">Tap for music</div>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="background-music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ═══════════ COUNTDOWN VIEW ═══════════ -->
+<div id="countdownView">
+  <div class="today-label" id="todayLabel">TODAY</div>
+  <div class="today-date" id="todayDate">—</div>
+  <div class="today-clock" id="todayClock">—</div>
+
+  <div class="occasion-eyebrow">Counting down to</div>
+  <div class="occasion-name">Habiba's Birthday</div>
+
+  <div class="timer">
+    <div class="timer-unit">
+      <div class="timer-num" id="tHours">00</div>
+      <div class="timer-label">Hours</div>
+    </div>
+    <div class="timer-sep">:</div>
+    <div class="timer-unit">
+      <div class="timer-num" id="tMinutes">00</div>
+      <div class="timer-label">Minutes</div>
+    </div>
+    <div class="timer-sep">:</div>
+    <div class="timer-unit">
+      <div class="timer-num" id="tSeconds">00</div>
+      <div class="timer-label">Seconds</div>
+    </div>
+  </div>
+
+  <div class="countdown-msg">Every tick of the clock brings me closer to celebrating the gentlest heart I've ever known — my forever girl <span class="heart">♥</span></div>
+</div>
+
+<!-- ═══════════ CELEBRATION VIEW ═══════════ -->
+<div id="celebrateView">
+  <div class="cel-eyebrow">The wait is over</div>
+  <div class="cel-title">Happy <span class="gold">22nd</span> Birthday</div>
+  <div class="cel-name">Habiba</div>
+  <div class="cel-sep"></div>
+
+  <div class="cel-messages">
+    <div class="cel-msg">Every year you get sweeter, kinder, and even more beautiful — and you were already the most beautiful thing that ever happened to me.</div>
+    <div class="cel-msg">Twenty-two years made you into the woman I fell in love with. Here's to every year still ahead of us.</div>
+    <div class="cel-msg script">And you, my love — you're always so good to everyone around you.</div>
+  </div>
+
+  <div class="video-wrap">
+    <div class="video-label">Your Surprise</div>
+    <video id="birthdayVideo" controls playsinline poster="">
+      <source src="birthday-video.mp4" type="video/mp4">
+    </video>
+    <div id="videoFallback" class="video-fallback" style="display:none">
+      Your video will appear here once it's added 💛<br>
+      <span style="font-size:13px">(place a file named "birthday-video.mp4" next to this page)</span>
+    </div>
+    <button class="play-btn" id="playBtn" onclick="playVideo()">▶ Play My Surprise</button>
+  </div>
+</div>
+
+<script>
+// ═══════════ EGYPT TIME ENGINE ═══════════
+const CAIRO_TZ = 'Africa/Cairo';
+const TARGET = new Date('2026-09-30T00:00:00+02:00'); // Habiba's birthday, Cairo time
+
+function getCairoParts() {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: CAIRO_TZ,
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+  });
+  const parts = fmt.formatToParts(now);
+  const map = {};
+  parts.forEach(p => map[p.type] = p.value);
+  return { now, map };
+}
+
+function updateClock() {
+  const { now, map } = getCairoParts();
+  document.getElementById('todayDate').textContent = `${map.weekday}, ${map.month} ${map.day}, ${map.year}`;
+  document.getElementById('todayClock').textContent = `${map.hour}:${map.minute}:${map.second} ${map.dayPeriod} — Cairo Time`;
+
+  const diff = TARGET.getTime() - now.getTime();
+
+  if (diff <= 0) {
+    showCelebration();
+    return;
+  }
+
+  const totalSeconds = Math.floor(diff / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  document.getElementById('tHours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('tMinutes').textContent = String(minutes).padStart(2, '0');
+  document.getElementById('tSeconds').textContent = String(seconds).padStart(2, '0');
+}
+
+let celebrating = false;
+function showCelebration() {
+  if (celebrating) return;
+  celebrating = true;
+  document.getElementById('countdownView').style.display = 'none';
+  document.getElementById('celebrateView').style.display = 'flex';
+  startHearts();
+
+  // Check if video exists
+  const video = document.getElementById('birthdayVideo');
+  video.addEventListener('error', () => {
+    video.style.display = 'none';
+    document.getElementById('videoFallback').style.display = 'block';
+    document.getElementById('playBtn').style.display = 'none';
+  });
+}
+
+function playVideo() {
+  const video = document.getElementById('birthdayVideo');
+  video.play().catch(() => {});
+}
+
+// ═══════════ MUSIC ═══════════
+let musicPlaying = false;
+function toggleMusic() {
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicToggle');
+  const hint = document.getElementById('musicHint');
+
+  if (!musicPlaying) {
+    audio.volume = 0.5;
+    audio.play().then(() => {
+      musicPlaying = true;
+      btn.textContent = '🔊';
+      btn.classList.add('playing');
+      hint.style.display = 'none';
+    }).catch(() => {
+      hint.textContent = 'Music file not found';
+    });
+  } else {
+    audio.pause();
+    musicPlaying = false;
+    btn.textContent = '🔈';
+    btn.classList.remove('playing');
+  }
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════ BACKGROUND STARS ═══════════
+function createStars() {
+  const container = document.getElementById('starsContainer');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 1;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + 'vw';
+    star.style.top = Math.random() * 100 + 'vh';
+    star.style.animationDelay = Math.random() * 4 + 's';
+    container.appendChild(star);
+  }
+}
+createStars();
+
+// ═══════════ FLOATING HEARTS (celebration only) ═══════════
+function startHearts() {
+  setInterval(() => {
+    const heart = document.createElement('div');
+    heart.className = 'float-heart';
+    heart.textContent = Math.random() > 0.5 ? '♥' : '✦';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.fontSize = (Math.random() * 14 + 12) + 'px';
+    heart.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+  }, 700);
+}
+</script>
+
+</body>
+</html>
